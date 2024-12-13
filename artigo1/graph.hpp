@@ -1,5 +1,5 @@
-#ifndef GRAPH_HPP
-#define GRAPH_HPP
+#ifndef GRAPH_H
+#define GRAPH_H
 
 #include <vector>
 #include <cmath>
@@ -75,10 +75,6 @@ public:
         }
     }
 
-    // Função estática para criar e retornar o grafo a partir de uma imagem
-    static Graph createGraph(const vector<vector<Pixel>>& image, int width, int height) {
-        return Graph(image, width, height);
-    }
 
 private:
     // Função para calcular os pesos de uma aresta com base nas diferenças de intensidade

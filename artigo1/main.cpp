@@ -6,6 +6,7 @@
 
 #include "imageloader.hpp"
 #include "graph.hpp"
+#include "component.hpp"
 
 using namespace std;
 // Função para imprimir a matriz de pixels
@@ -41,7 +42,7 @@ void printPixels(const vector<vector<Pixel>> &image, int width, int height)
 
 int main()
 {
-    string filename = "imagemTeste1.ppm";
+    string filename = "teste.ppm";
     int width, height;
 
     try
@@ -56,8 +57,14 @@ int main()
         // Criar o grafo a partir da imagem
         Graph graph(image, width, height);
 
+        //printf("\n%d\n", graph.numVertices);
+
         // Imprimir informações do grafo para verificar
-        graph.printGraph();
+        //graph.printGraph();
+
+        GraphComponents component(graph);
+
+        component.printComponents();
 
         // Imprimir pixels e suas posições
         // printPixels(image, width, height);
