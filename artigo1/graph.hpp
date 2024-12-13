@@ -13,7 +13,9 @@ using namespace std;
 struct Edge {
     int src; // Vértice de origem
     int dest; // Vértice de destino
-    double weight; // Peso da aresta
+    double weightR; // Peso da aresta para o canal R
+    double weightG; // Peso da aresta para o canal G
+    double weightB; // Peso da aresta para o canal B
 };
 
 // Classe para representar o grafo
@@ -34,29 +36,29 @@ public:
                 // Adicionar aresta para o pixel da direita
                 if (x + 1 < width) {
                     int right = y * width + (x + 1);
-                    double weight = calculateWeight(image[y][x], image[y][x + 1]);
-                    edges.push_back({current, right, weight});
+                    auto weights = calculateWeights(image[y][x], image[y][x + 1]);
+                    edges.push_back({current, right, weights[0], weights[1], weights[2]});
                 }
 
                 // Adicionar aresta para o pixel abaixo
                 if (y + 1 < height) {
                     int below = (y + 1) * width + x;
-                    double weight = calculateWeight(image[y][x], image[y + 1][x]);
-                    edges.push_back({current, below, weight});
+                    auto weights = calculateWeights(image[y][x], image[y + 1][x]);
+                    edges.push_back({current, below, weights[0], weights[1], weights[2]});
                 }
 
                 // Opcional: Adicionar arestas diagonais (inferior direito)
                 if (x + 1 < width && y + 1 < height) {
                     int diagRight = (y + 1) * width + (x + 1);
-                    double weight = calculateWeight(image[y][x], image[y + 1][x + 1]);
-                    edges.push_back({current, diagRight, weight});
+                    auto weights = calculateWeights(image[y][x], image[y + 1][x + 1]);
+                    edges.push_back({current, diagRight, weights[0], weights[1], weights[2]});
                 }
 
                 // Opcional: Adicionar arestas diagonais (inferior esquerdo)
                 if (x - 1 >= 0 && y + 1 < height) {
                     int diagLeft = (y + 1) * width + (x - 1);
-                    double weight = calculateWeight(image[y][x], image[y + 1][x - 1]);
-                    edges.push_back({current, diagLeft, weight});
+                    auto weights = calculateWeights(image[y][x], image[y + 1][x - 1]);
+                    edges.push_back({current, diagLeft, weights[0], weights[1], weights[2]});
                 }
             }
         }
@@ -67,7 +69,9 @@ public:
         for (const auto& edge : edges) {
             cout << "Origem: " << edge.src
                  << ", Destino: " << edge.dest
-                 << ", Peso: " << edge.weight << endl;
+                 << ", Peso R: " << edge.weightR
+                 << ", Peso G: " << edge.weightG
+                 << ", Peso B: " << edge.weightB << endl;
         }
     }
 
@@ -77,12 +81,12 @@ public:
     }
 
 private:
-    // Função para calcular o peso de uma aresta com base na diferença de intensidade
-    double calculateWeight(const Pixel& p1, const Pixel& p2) {
-        double diffR = p1.r - p2.r;
-        double diffG = p1.g - p2.g;
-        double diffB = p1.b - p2.b;
-        return sqrt(diffR * diffR + diffG * diffG + diffB * diffB); // Distância Euclidiana no espaço RGB
+    // Função para calcular os pesos de uma aresta com base nas diferenças de intensidade
+    vector<double> calculateWeights(const Pixel& p1, const Pixel& p2) {
+        double diffR = abs(p1.r - p2.r);
+        double diffG = abs(p1.g - p2.g);
+        double diffB = abs(p1.b - p2.b);
+        return {diffR, diffG, diffB};
     }
 };
 
