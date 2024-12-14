@@ -7,7 +7,6 @@
 #include "imageloader.hpp"
 #include "graph.hpp"
 #include "component.hpp"
-#include "predicate.hpp"
 #include "color_components.hpp"
 
 using namespace std;
@@ -75,12 +74,14 @@ int main()
         // Processar as arestas
         components.segmentGraph(graph, K);
 
-        components.printComponents();
+        int componentesnum = components.getNumberOfComponents();
+
+        cout << componentesnum << endl;
 
         auto coloredImage = ImageColorizer::colorComponents(image, components, width, height);
 
-        // 5. Salvar a imagem colorida como "saida.ppm"
-        ImageColorizer::savePPM("saida.ppm", coloredImage, width, height);
+        // Salvar a imagem colorida como "saida.ppm"
+        ImageColorizer::savePPM("images/saida/saida.ppm", coloredImage, width, height);
 
         cout << "Imagem segmentada salva como 'saida.ppm'." << endl;
 
