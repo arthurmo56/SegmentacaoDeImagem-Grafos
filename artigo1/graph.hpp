@@ -75,8 +75,6 @@ public:
         }
     }
 
-
-private:
     // Função para calcular os pesos de uma aresta com base nas diferenças de intensidade
     vector<double> calculateWeights(const Pixel& p1, const Pixel& p2) {
         double diffR = abs(p1.r - p2.r);

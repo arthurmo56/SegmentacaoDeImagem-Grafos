@@ -7,6 +7,7 @@
 #include "imageloader.hpp"
 #include "graph.hpp"
 #include "component.hpp"
+#include "predicate.hpp"
 
 using namespace std;
 // Função para imprimir a matriz de pixels
@@ -57,14 +58,34 @@ int main()
         // Criar o grafo a partir da imagem
         Graph graph(image, width, height);
 
+        // Número de vértices do grafo criado
         //printf("\n%d\n", graph.numVertices);
 
         // Imprimir informações do grafo para verificar
         //graph.printGraph();
 
-        GraphComponents component(graph);
+        // Parâmetro k de controle 
+        double K = 1.0;
 
-        component.printComponents();
+        GraphComponents graphComponents(graph, K);
+
+
+        // Inicializar o predicado
+        Predicate predicate(graphComponents, graph.numVertices, K);
+
+        // Processar as arestas
+        for (const auto& edge : graph.edges) {
+            if (!predicate.evaluate(edge)) {
+                predicate.mergeRegions(edge);
+            }
+        }
+
+        // Exibir os componentes resultantes
+        graphComponents.printComponents();
+
+        // Número total de componentes
+        int totalComponents = graphComponents.getNumberOfComponents();
+        cout << "Numero total de componentes: " << totalComponents << endl;
 
         // Imprimir pixels e suas posições
         // printPixels(image, width, height);

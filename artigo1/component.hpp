@@ -2,12 +2,15 @@
 #define COMPONENT_H
 
 #include <vector>
+#include <iostream>
+#include <cmath>
+#include <algorithm>
 #include "graph.hpp"
 
 using namespace std;
 
 class GraphComponents {
-private:
+public:
     vector<int> parent; // Vetor para armazenar o pai de cada vértice
     vector<int> rank;   // Vetor para armazenar a "altura" da árvore de cada conjunto
 
@@ -36,8 +39,21 @@ private:
         }
     }
 
-public:
-    GraphComponents(const Graph& graph) {
+    // Calcular a norma euclidiana dos pesos RGB
+    double calculateEdgeWeight(const Edge& edge) {
+        return sqrt(edge.weightR * edge.weightR +
+                    edge.weightG * edge.weightG +
+                    edge.weightB * edge.weightB);
+    }
+
+    // Predicado para decidir se dois componentes devem ser unidos
+    bool predicate(double internalDiff1, double internalDiff2, double edgeWeight, double K) {
+        double minInternalDiff = min(internalDiff1, internalDiff2);
+        return edgeWeight > minInternalDiff + K; // Se true, não unir; se false, unir
+    }
+
+
+    GraphComponents(Graph& graph, double K) {
         // Inicializar o DSU para todos os vértices
         parent.resize(graph.numVertices);
         rank.resize(graph.numVertices, 0);
@@ -45,9 +61,34 @@ public:
             parent[i] = i; // Cada vértice é seu próprio pai inicialmente
         }
 
-        // Processar todas as arestas para unir componentes
+        // Calcular pesos totais para todas as arestas
+        for (auto& edge : graph.edges) {
+            edge.weightR = calculateEdgeWeight(edge);
+        }
+
+        // Ordenar arestas pelo peso total
+        sort(graph.edges.begin(), graph.edges.end(), [](const Edge& a, const Edge& b) {
+            return a.weightR < b.weightR; // Usando o peso calculado
+        });
+
+        // Inicializar o vetor de diferenças internas
+        vector<double> internalDiff(graph.numVertices, 0.0);
+
+        // Processar as arestas ordenadas
         for (const auto& edge : graph.edges) {
-            unite(edge.src, edge.dest);
+            int root1 = find(edge.src);
+            int root2 = find(edge.dest);
+
+            if (root1 != root2) {
+                double edgeWeight = calculateEdgeWeight(edge);
+
+                // Calcular o predicado
+                if (!predicate(internalDiff[root1], internalDiff[root2], edgeWeight, K)) {
+                    unite(root1, root2);
+                    // Atualizar a diferença interna do novo componente
+                    internalDiff[find(root1)] = edgeWeight;
+                }
+            }
         }
     }
 
