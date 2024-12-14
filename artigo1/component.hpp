@@ -14,6 +14,15 @@ public:
     vector<int> parent; // Vetor para armazenar o pai de cada vértice
     vector<int> rank;   // Vetor para armazenar a "altura" da árvore de cada conjunto
 
+    // Construtor para inicializar os conjuntos disjuntos
+    GraphComponents(int numVertices) {
+        parent.resize(numVertices);
+        rank.resize(numVertices, 0);
+        for (int i = 0; i < numVertices; ++i) {
+            parent[i] = i; // Cada vértice é seu próprio pai inicialmente
+        }
+    }
+
     // Encontrar o representante (raiz) do conjunto ao qual o vértice pertence
     int find(int vertex) {
         if (parent[vertex] != vertex) {
@@ -39,54 +48,46 @@ public:
         }
     }
 
-    // Calcular a norma euclidiana dos pesos RGB
-    double calculateEdgeWeight(const Edge& edge) {
-        return sqrt(edge.weightR * edge.weightR +
-                    edge.weightG * edge.weightG +
-                    edge.weightB * edge.weightB);
+    // Calcular a diferença interna da componente (Int(C))
+    double calculateInternalDifference(const vector<Edge>& mstEdges) {
+        double maxWeight = 0.0;
+        for (const auto& edge : mstEdges) {
+            maxWeight = max(maxWeight, edge.weightR);
+        }
+        return maxWeight; // Int(C): maior peso na MST da componente
     }
 
-    // Predicado para decidir se dois componentes devem ser unidos
-    bool predicate(double internalDiff1, double internalDiff2, double edgeWeight, double K) {
-        double minInternalDiff = min(internalDiff1, internalDiff2);
-        return edgeWeight > minInternalDiff + K; // Se true, não unir; se false, unir
-    }
+    // Implementar o algoritmo de segmentação com base no artigo
+    void segmentGraph(Graph& graph, double k) {
+        vector<double> internalDifference(graph.numVertices, 0.0); // Int(C)
+        vector<int> componentSize(graph.numVertices, 1); // |C|
 
-
-    GraphComponents(Graph& graph, double K) {
-        // Inicializar o DSU para todos os vértices
-        parent.resize(graph.numVertices);
-        rank.resize(graph.numVertices, 0);
-        for (int i = 0; i < graph.numVertices; ++i) {
-            parent[i] = i; // Cada vértice é seu próprio pai inicialmente
-        }
-
-        // Calcular pesos totais para todas as arestas
-        for (auto& edge : graph.edges) {
-            edge.weightR = calculateEdgeWeight(edge);
-        }
-
-        // Ordenar arestas pelo peso total
+        // Ordenar as arestas por peso
         sort(graph.edges.begin(), graph.edges.end(), [](const Edge& a, const Edge& b) {
-            return a.weightR < b.weightR; // Usando o peso calculado
+            return a.weightR < b.weightR;
         });
 
-        // Inicializar o vetor de diferenças internas
-        vector<double> internalDiff(graph.numVertices, 0.0);
-
-        // Processar as arestas ordenadas
+        // Processar arestas para segmentação
         for (const auto& edge : graph.edges) {
             int root1 = find(edge.src);
             int root2 = find(edge.dest);
 
             if (root1 != root2) {
-                double edgeWeight = calculateEdgeWeight(edge);
+                double diff = edge.weightR; // Dif(C1, C2): menor peso entre componentes
+                double tau1 = k / componentSize[root1]; // k/|C1|
+                double tau2 = k / componentSize[root2]; // k/|C2|
 
-                // Calcular o predicado
-                if (!predicate(internalDiff[root1], internalDiff[root2], edgeWeight, K)) {
+                double minInternalDifference = min(internalDifference[root1] + tau1, internalDifference[root2] + tau2); // MInt(C1, C2)
+
+                // Verificar o predicado D(C1, C2)
+                if (diff <= minInternalDifference) {
+                    // Unir os componentes
                     unite(root1, root2);
-                    // Atualizar a diferença interna do novo componente
-                    internalDiff[find(root1)] = edgeWeight;
+                    int newRoot = find(root1);
+
+                    // Atualizar Int(C) e tamanho da nova componente
+                    internalDifference[newRoot] = max({internalDifference[root1], internalDifference[root2], diff});
+                    componentSize[newRoot] = componentSize[root1] + componentSize[root2];
                 }
             }
         }

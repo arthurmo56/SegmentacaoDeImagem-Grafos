@@ -8,6 +8,7 @@
 #include "graph.hpp"
 #include "component.hpp"
 #include "predicate.hpp"
+#include "color_components.hpp"
 
 using namespace std;
 // Função para imprimir a matriz de pixels
@@ -29,21 +30,21 @@ void printImage(const vector<vector<Pixel>> &image, int width, int height)
 // Função para mostrar todos os pixels
 void printPixels(const vector<vector<Pixel>> &image, int width, int height)
 {
-        for (int y = 0; y < height; ++y)
+    for (int y = 0; y < height; ++y)
+    {
+        for (int x = 0; x < width; ++x)
         {
-            for (int x = 0; x < width; ++x)
-            {
-                cout << "Pixel [" << y << "][" << x << "]: "
-                     << "R=" << image[y][x].r << ", "
-                     << "G=" << image[y][x].g << ", "
-                     << "B=" << image[y][x].b << endl;
-            }
+            cout << "Pixel [" << y << "][" << x << "]: "
+                 << "R=" << image[y][x].r << ", "
+                 << "G=" << image[y][x].g << ", "
+                 << "B=" << image[y][x].b << endl;
         }
+    }
 }
 
 int main()
 {
-    string filename = "teste.ppm";
+    string filename = "images/japao.ppm";
     int width, height;
 
     try
@@ -59,33 +60,29 @@ int main()
         Graph graph(image, width, height);
 
         // Número de vértices do grafo criado
-        //printf("\n%d\n", graph.numVertices);
+        // printf("\n%d\n", graph.numVertices);
 
         // Imprimir informações do grafo para verificar
-        //graph.printGraph();
+        // graph.printGraph();
 
-        // Parâmetro k de controle 
-        double K = 1.0;
-
-        GraphComponents graphComponents(graph, K);
-
+        // Parâmetro k de controle
+        double K = 300.0;
+        GraphComponents components(graph.numVertices);
 
         // Inicializar o predicado
-        Predicate predicate(graphComponents, graph.numVertices, K);
+        // Predicate predicate(graphComponents, graph.numVertices, K);
 
         // Processar as arestas
-        for (const auto& edge : graph.edges) {
-            if (!predicate.evaluate(edge)) {
-                predicate.mergeRegions(edge);
-            }
-        }
+        components.segmentGraph(graph, K);
 
-        // Exibir os componentes resultantes
-        graphComponents.printComponents();
+        components.printComponents();
 
-        // Número total de componentes
-        int totalComponents = graphComponents.getNumberOfComponents();
-        cout << "Numero total de componentes: " << totalComponents << endl;
+        auto coloredImage = ImageColorizer::colorComponents(image, components, width, height);
+
+        // 5. Salvar a imagem colorida como "saida.ppm"
+        ImageColorizer::savePPM("saida.ppm", coloredImage, width, height);
+
+        cout << "Imagem segmentada salva como 'saida.ppm'." << endl;
 
         // Imprimir pixels e suas posições
         // printPixels(image, width, height);
