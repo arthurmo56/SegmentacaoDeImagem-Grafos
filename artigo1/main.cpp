@@ -43,7 +43,7 @@ void printPixels(const vector<vector<Pixel>> &image, int width, int height)
 
 int main()
 {
-    string filename = "images/japao.ppm";
+    string filename = "images/teste.ppm";
     int width, height;
 
     try

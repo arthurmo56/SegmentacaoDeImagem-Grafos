@@ -11,8 +11,8 @@ using namespace std;
 
 // Estrutura para uma aresta do grafo
 struct Edge {
-    int src; // Vértice de origem
-    int dest; // Vértice de destino
+    int a; // Vértice de origem
+    int b; // Vértice de bino
     double weightR; // Peso da aresta para o canal R
     double weightG; // Peso da aresta para o canal G
     double weightB; // Peso da aresta para o canal B
@@ -67,8 +67,8 @@ public:
     // Função para exibir o grafo
     void printGraph() const {
         for (const auto& edge : edges) {
-            cout << "Origem: " << edge.src
-                 << ", Destino: " << edge.dest
+            cout << "Origem: " << edge.a
+                 << ", bino: " << edge.b
                  << ", Peso R: " << edge.weightR
                  << ", Peso G: " << edge.weightG
                  << ", Peso B: " << edge.weightB << endl;
