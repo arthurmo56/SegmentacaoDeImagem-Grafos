@@ -30,17 +30,17 @@ Os dois métodos foram comparados em termos de:
 
 #### Exemplo 1: Método MST
 **Imagem Original:**  
-![Imagem Original MST](#)  
+![Imagem Original MST](images/Ex1ImgOriginal.png)  
 
 **Imagem Segmentada:**  
-![Imagem Segmentada MST](#)  
+![Imagem Segmentada MST](images/Ex1ImgSegmentada.png)  
 
 #### Exemplo 2: Método Min-Cut/Max-Flow
 **Imagem Original:**  
-![Imagem Original Min-Cut](#)  
+![Imagem Original Min-Cut](images/Ex2ImgOriginal.png)  
 
 **Imagem Segmentada:**  
-![Imagem Segmentada Min-Cut](#) 
+![Imagem Segmentada Min-Cut](images/Ex2ImgSegmentada.png) 
 
 ## Conclusões
 Este projeto demonstrou a eficácia de métodos baseados em grafos na segmentação de imagens. A técnica de Felzenszwalb e Huttenlocher mostrou-se ideal para segmentações rápidas e com preservação de detalhes locais. Por outro lado, o método de Boykov e Funka-Lea destacou-se pela precisão em contextos onde há informações prévias (seeds) sobre o objeto e o fundo.
